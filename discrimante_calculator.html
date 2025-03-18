@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discriminant Calculator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #ff7e5f, #feb47b); /* Soft gradient background */
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            box-sizing: border-box;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto; /* Allow vertical scrolling */
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            width: 350px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            max-height: 80vh; /* Limits the height of the container */
+            overflow-y: auto; /* Enables vertical scrolling */
+        }
+
+        label {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            display: block;
+            font-weight: bold;
+        }
+
+        input {
+            margin-bottom: 15px;
+            padding: 10px;
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #fff;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 1.2rem;
+            outline: none;
+            box-sizing: border-box;
+            transition: background 0.3s;
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .discriminant {
+            font-size: 1.2rem;
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            max-width: 90%;
+            word-wrap: break-word;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .equation {
+            font-size: 1.2rem;
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            max-width: 90%;
+            word-wrap: break-word;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Discriminant Calculator</h2>
+        <label for="a">Enter value for a:</label>
+        <input type="number" id="a" placeholder="Enter a">
+        <br>
+
+        <label for="b">Enter value for b:</label>
+        <input type="number" id="b" placeholder="Enter b">
+        <br>
+
+        <label for="c">Enter value for c:</label>
+        <input type="number" id="c" placeholder="Enter c">
+        <br>
+
+        <button onclick="calculate()">Calculate Discriminant</button>
+
+        <p id="equation" class="equation"></p>
+        <p id="discriminant" class="discriminant"></p>
+
+        <button onclick="calculateRoots()">Calculate Roots</button>
+        <p id="roots" class="discriminant"></p>
+    </div>
+
+    <script>
+        let discriminant = 0; // Global variable to store discriminant
+        let a = 0, b = 0, c = 0;
+
+        function calculate() {
+            a = parseFloat(document.getElementById("a").value);
+            b = parseFloat(document.getElementById("b").value);
+            c = parseFloat(document.getElementById("c").value);
+
+            if (isNaN(a) || isNaN(b) || isNaN(c)) {
+                document.getElementById("discriminant").innerText = "Please enter valid numbers.";
+                return;
+            }
+
+            discriminant = (b ** 2) - (4 * a * c);
+            let equationText = `Δ = b² - 4(a)(c) = ${b}² - 4(${a})(${c})`;
+
+            document.getElementById("equation").innerText = equationText;
+            document.getElementById("discriminant").innerText = "Discriminant: " + discriminant;
+
+            // Check the nature of the roots based on the discriminant
+            let roots = "";
+            if (discriminant > 0) {
+                roots = "The equation has two real roots.";
+            } else if (discriminant === 0) {
+                roots = "The equation has one double real root.";
+            } else {
+                roots = "The equation has two complex conjugate roots.";
+            }
+            document.getElementById("roots").innerText = roots;
+        }
+
+        function calculateRoots() {
+            let root1, root2;
+            if (discriminant < 0) {
+                // Complex roots
+                let realPart = `-${b} / 2(${a})`;
+                let imaginaryPart = `√(${Math.abs(discriminant)}) / 2(${a})`;
+                document.getElementById("roots").innerText = `x₁ = ${realPart} + ${simplifySqrt(Math.abs(discriminant))}i, x₂ = ${realPart} - ${simplifySqrt(Math.abs(discriminant))}i`;
+            } else {
+                // Real roots
+                let numerator1 = -b + Math.sqrt(discriminant);
+                let numerator2 = -b - Math.sqrt(discriminant);
+                let denominator = 2 * a;
+
+                root1 = simplifyFraction(numerator1, denominator);
+                root2 = simplifyFraction(numerator2, denominator);
+
+                document.getElementById("roots").innerText = `x₁ = ${root1}, x₂ = ${root2}`;
+            }
+        }
+
+        function simplifyFraction(numerator, denominator) {
+            if (denominator === 0) {
+                return 'Undefined'; // Avoid division by zero
+            }
+
+            // Reduce fraction if it's a fraction
+            let gcdValue = gcd(numerator, denominator);
+            numerator /= gcdValue;
+            denominator /= gcdValue;
+
+            // Handle negative denominators
+            if (denominator < 0) {
+                numerator = -numerator;
+                denominator = -denominator;
+            }
+
+            // If it's a fraction, return it simplified
+            if (denominator !== 1) {
+                return `${numerator}/${denominator}`;
+            }
+
+            // If it's just an integer, return it
+            return `${numerator}`;
+        }
+
+        function simplifySqrt(value) {
+            let factor = 2; // Start simplifying for 2 as a factor
+            while (factor * factor <= value) {
+                if (value % (factor * factor) === 0) {
+                    return `${factor}√${value / (factor * factor)}`; // Simplify the square root
+                }
+                factor++;
+            }
+            return `√${value}`; // Return unsimplified root
+        }
+
+        function gcd(a, b) {
+            while (b !== 0) {
+                let temp = b;
+                b = a % b;
+                a = temp;
+            }
+            return a;
+        }
+    </script>
+</body>
+</html>
